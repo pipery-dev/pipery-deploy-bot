@@ -1,0 +1,63 @@
+name: Schedule Pipery Deploy
+description: Schedule a one-time deploy through pipery-deploy-bot.
+inputs:
+  api-url:
+    description: Base URL for pipery-deploy-bot.
+    required: true
+  api-token:
+    description: Bearer token accepted by the pipery-deploy-bot deployment.
+    required: true
+  idempotency-key:
+    description: Unique key for this scheduled deploy request.
+    required: true
+  installation-key:
+    description: GitHub App installation key configured in pipery-deploy-bot.
+    default: default
+  owner:
+    description: Repository owner.
+    required: true
+  repo:
+    description: Repository name.
+    required: true
+  workflow-id:
+    description: Workflow file name or numeric workflow id to dispatch.
+    required: true
+  ref:
+    description: Git ref to dispatch.
+    required: true
+  scheduled-at:
+    description: UTC RFC3339 timestamp, for example 2026-05-17T12:00:00Z.
+    required: true
+  inputs-json:
+    description: JSON object passed to workflow_dispatch inputs.
+    default: "{}"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        jq -n \
+          --arg idempotency_key "${{ inputs.idempotency-key }}" \
+          --arg installation_key "${{ inputs.installation-key }}" \
+          --arg owner "${{ inputs.owner }}" \
+          --arg repo "${{ inputs.repo }}" \
+          --arg workflow_id "${{ inputs.workflow-id }}" \
+          --arg ref "${{ inputs.ref }}" \
+          --arg scheduled_at "${{ inputs.scheduled-at }}" \
+          --argjson inputs '${{ inputs.inputs-json }}' \
+          '{
+            idempotency_key: $idempotency_key,
+            installation_key: $installation_key,
+            owner: $owner,
+            repo: $repo,
+            workflow_id: $workflow_id,
+            ref: $ref,
+            scheduled_at: $scheduled_at,
+            inputs: $inputs
+          }' |
+        curl -fsS \
+          -X POST "${{ inputs.api-url }}/v1/scheduled-deploys" \
+          -H "Authorization: Bearer ${{ inputs.api-token }}" \
+          -H "Content-Type: application/json" \
+          --data-binary @-
