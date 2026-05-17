@@ -26,6 +26,30 @@ Config file:
 }
 ```
 
+## Helm
+
+Install the chart with existing secrets for Postgres, API token, and GitHub App private key:
+
+```sh
+helm upgrade --install pipery-deploy-bot ./charts/pipery-deploy-bot \
+  --namespace pipery \
+  --create-namespace \
+  --set database.existingSecret=pipery-deploy-bot-database \
+  --set privateKey.existingSecret=pipery-deploy-bot-private-key \
+  --set apiToken.existingSecret=pipery-deploy-bot-api-token
+```
+
+The chart can run the Postgres migration as a Helm pre-install/pre-upgrade hook. Set `migrations.enabled=false` if migrations are managed elsewhere.
+
+## GitHub Actions
+
+The repository includes:
+
+- `.github/workflows/ci.yml` using `pipery-dev/pipery-golang-ci@v1`
+- `.github/workflows/deploy.yml` using `pipery-dev/pipery-helm-cd@v1`
+
+Set `KUBECONFIG_B64` as a repository or environment secret for the deploy workflow.
+
 Run migrations before starting the service:
 
 ```sh

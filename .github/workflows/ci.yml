@@ -1,0 +1,27 @@
+name: Pipery Go CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pipery-dev/pipery-golang-ci@v1
+        with:
+          go_version: "1.22"
+          tests_path: "./..."
+          image_name: ghcr.io/${{ github.repository }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_release: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          skip_reintegration: "true"

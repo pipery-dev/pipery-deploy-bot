@@ -1,0 +1,11 @@
+{{- if .Values.migrations.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pipery-deploy-bot.fullname" . }}-migrations
+  labels:
+    {{- include "pipery-deploy-bot.labels" . | nindent 4 }}
+data:
+  001_init.sql: |
+{{ .Files.Get "files/migrations/001_init.sql" | indent 4 }}
+{{- end }}

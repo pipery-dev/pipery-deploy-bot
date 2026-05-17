@@ -1,0 +1,37 @@
+name: Pipery Helm Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Image tag to deploy.
+        required: true
+        default: latest
+      namespace:
+        description: Kubernetes namespace.
+        required: true
+        default: pipery
+      release_name:
+        description: Helm release name.
+        required: true
+        default: pipery-deploy-bot
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pipery-dev/pipery-helm-cd@v1
+        with:
+          release_name: ${{ inputs.release_name }}
+          chart: ./charts/pipery-deploy-bot
+          namespace: ${{ inputs.namespace }}
+          image_tag: ${{ inputs.image_tag }}
+          image_key: image.tag
+          kubeconfig: ${{ secrets.KUBECONFIG_B64 }}
+          timeout: 10m

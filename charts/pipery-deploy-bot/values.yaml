@@ -1,0 +1,97 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/pipery-dev/pipery-deploy-bot
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: pipery-deploy-bot.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+apiToken:
+  existingSecret: ""
+  secretKey: api-token
+  value: ""
+
+database:
+  existingSecret: ""
+  secretKey: database-url
+  url: ""
+
+config:
+  existingSecret: ""
+  secretKey: config.json
+  data:
+    installations:
+      default:
+        app_id: 12345
+        installation_id: 67890
+        private_key_file: /etc/pipery/private-key/github-app.pem
+
+privateKey:
+  existingSecret: ""
+  secretKey: github-app.pem
+  value: ""
+
+scheduler:
+  interval: 30s
+
+migrations:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+  backoffLimit: 3
+
+probes:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 20
+  readiness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
