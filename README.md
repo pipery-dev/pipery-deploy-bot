@@ -45,7 +45,7 @@ The chart can run the Postgres migration as a Helm pre-install/pre-upgrade hook.
 
 The repository includes:
 
-- `.github/workflows/ci.yml` using `pipery-dev/pipery-golang-ci@v1`
+- `.github/workflows/ci.yml` using `pipery-dev/pipery-golang-ci@v1.0.4`
 - `.github/workflows/deploy.yml` using `pipery-dev/pipery-helm-cd@v1`
 
 Set `KUBECONFIG_B64` as a repository or environment secret for the deploy workflow.
