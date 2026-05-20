@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pipery-dev/pipery-golang-ci@v1.0.2
+      - uses: pipery-dev/pipery-golang-ci@v1.0.3
         with:
           go_version: "1.22"
           tests_path: "./..."
