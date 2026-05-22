@@ -17,10 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pipery-dev/pipery-golang-ci@v1.0.5
+      - uses: pipery-dev/pipery-golang-ci@v1
         with:
           go_version: "1.22"
           tests_path: "./..."
+          target_platforms: linux/amd64,linux/arm64,windows/amd64,darwin/amd64
           image_name: ghcr.io/${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           skip_release: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}

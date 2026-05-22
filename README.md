@@ -11,6 +11,8 @@ HTTP service for scheduling GitHub Actions `workflow_dispatch` deploys through a
 | `LISTEN_ADDR` | no | HTTP address, default `:8080`. |
 | `SCHEDULER_INTERVAL` | no | Scheduler poll interval, default `30s`. |
 | `PIPERY_DEPLOY_API_TOKEN` | no | If set, `/v1` APIs and dashboard require `Authorization: Bearer <token>`. |
+| `PIPERY_DEX_ISSUER` | no | Dex issuer URL for validating OIDC bearer tokens. |
+| `PIPERY_DEPLOY_DEX_CLIENT_ID` | no | Dex client/audience for deploy-bot tokens. |
 
 Config file:
 

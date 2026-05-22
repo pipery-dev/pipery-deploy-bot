@@ -48,6 +48,12 @@ spec:
                   key: {{ .Values.database.secretKey }}
             - name: SCHEDULER_INTERVAL
               value: {{ .Values.scheduler.interval | quote }}
+            {{- if .Values.dex.enabled }}
+            - name: PIPERY_DEX_ISSUER
+              value: {{ .Values.dex.issuer | quote }}
+            - name: PIPERY_DEPLOY_DEX_CLIENT_ID
+              value: {{ .Values.dex.clientId | quote }}
+            {{- end }}
             {{- if or .Values.apiToken.existingSecret .Values.apiToken.value }}
             - name: PIPERY_DEPLOY_API_TOKEN
               valueFrom:

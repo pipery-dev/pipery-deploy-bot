@@ -13,4 +13,5 @@ jobs:
     uses: pipery-dev/pipery-tooling/.github/workflows/pipery-cross-platform-release.yml@main
     with:
       repo_name: pipery-deploy-bot
+      go_target_platforms: linux/amd64,linux/arm64,windows/amd64,darwin/amd64
     secrets: inherit

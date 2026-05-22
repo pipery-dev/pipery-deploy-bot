@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/pipery-dev/pipery-deploy-bot/internal/deploy"
 )
 
@@ -253,4 +254,29 @@ func TestBearerAuthProtectsAPIsAndDashboardButNotHealth(t *testing.T) {
 	if !strings.Contains(rec.Body.String(), "Pipery Deploy Bot") {
 		t.Fatalf("dashboard body missing title: %s", rec.Body.String())
 	}
+}
+
+func TestDexAuthAcceptsVerifiedBearerToken(t *testing.T) {
+	server := NewServer(&handlerStore{}, &authenticator{verifier: fakeVerifier{validToken: "dex-token"}})
+
+	req := httptest.NewRequest(http.MethodGet, "/dashboard", nil)
+	req.Header.Set("Authorization", "Bearer dex-token")
+	rec := httptest.NewRecorder()
+
+	server.Routes().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("dashboard status = %d, want 200; body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+type fakeVerifier struct {
+	validToken string
+}
+
+func (v fakeVerifier) Verify(_ context.Context, token string) (*oidc.IDToken, error) {
+	if token != v.validToken {
+		return nil, errors.New("invalid token")
+	}
+	return &oidc.IDToken{}, nil
 }

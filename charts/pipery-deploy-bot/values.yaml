@@ -55,6 +55,11 @@ apiToken:
   secretKey: api-token
   value: ""
 
+dex:
+  enabled: false
+  issuer: https://auth.pipery.dev/dex
+  clientId: pipery-deploy-bot
+
 database:
   existingSecret: ""
   secretKey: database-url

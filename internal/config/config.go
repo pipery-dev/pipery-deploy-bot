@@ -16,6 +16,12 @@ type Config struct {
 	PGConfig          *pgx.ConnConfig
 	Installations     map[string]GitHubAppInstall
 	APIToken          string
+	OIDC              OIDC
+}
+
+type OIDC struct {
+	IssuerURL string
+	ClientID  string
 }
 
 type fileConfig struct {
@@ -82,5 +88,9 @@ func Load() (Config, error) {
 		PGConfig:          pgConfig,
 		Installations:     file.Installations,
 		APIToken:          os.Getenv("PIPERY_DEPLOY_API_TOKEN"),
+		OIDC: OIDC{
+			IssuerURL: os.Getenv("PIPERY_DEX_ISSUER"),
+			ClientID:  os.Getenv("PIPERY_DEPLOY_DEX_CLIENT_ID"),
+		},
 	}, nil
 }

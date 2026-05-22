@@ -21,14 +21,19 @@ type Store interface {
 }
 
 type Server struct {
-	store    Store
-	apiToken string
+	store         Store
+	authenticator *authenticator
 }
 
-func NewServer(store Store, apiToken ...string) *Server {
+func NewServer(store Store, auth ...any) *Server {
 	server := &Server{store: store}
-	if len(apiToken) > 0 {
-		server.apiToken = apiToken[0]
+	if len(auth) > 0 {
+		switch value := auth[0].(type) {
+		case *authenticator:
+			server.authenticator = value
+		case string:
+			server.authenticator = &authenticator{apiToken: value}
+		}
 	}
 	return server
 }
@@ -45,7 +50,7 @@ func (s *Server) Routes() http.Handler {
 }
 
 func (s *Server) auth(next http.Handler) http.Handler {
-	if s.apiToken == "" {
+	if !s.authenticator.Enabled() {
 		return next
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +58,8 @@ func (s *Server) auth(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		if r.Header.Get("Authorization") != "Bearer "+s.apiToken {
-			writeError(w, http.StatusUnauthorized, "unauthorized")
+		if !s.authenticator.Authorize(r.Context(), r.Header.Get("Authorization")) {
+			bearerAuthError(w)
 			return
 		}
 		next.ServeHTTP(w, r)

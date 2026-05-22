@@ -34,7 +34,15 @@ func main() {
 	auth := github.NewAppAuthenticator(http.DefaultClient, cfg.Installations)
 	gh := github.NewClient(http.DefaultClient, auth)
 	sched := scheduler.New(storage, gh, cfg.SchedulerInterval, 5)
-	server := httpapi.NewServer(storage, cfg.APIToken)
+	apiAuth, err := httpapi.NewAuthenticator(context.Background(), httpapi.AuthConfig{
+		APIToken:  cfg.APIToken,
+		IssuerURL: cfg.OIDC.IssuerURL,
+		ClientID:  cfg.OIDC.ClientID,
+	})
+	if err != nil {
+		log.Fatalf("configure auth: %v", err)
+	}
+	server := httpapi.NewServer(storage, apiAuth)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
