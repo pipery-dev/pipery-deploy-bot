@@ -1,0 +1,11 @@
+{{- if not .Values.config.existingConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pipery-deploy-bot.configName" . }}
+  labels:
+    {{- include "pipery-deploy-bot.labels" . | nindent 4 }}
+data:
+  {{ .Values.config.secretKey }}: |
+    {{- toPrettyJson .Values.config.data | nindent 4 }}
+{{- end }}

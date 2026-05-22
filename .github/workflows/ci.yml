@@ -27,13 +27,29 @@ jobs:
           skip_release: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
           skip_reintegration: "true"
 
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pipery-dev/pipery-argocd-cd@v1
+        with:
+          validate_helm_chart: "true"
+          app_name: pipery-deploy-bot
+          chart_path: charts/pipery-deploy-bot
+          skip_update: "true"
+          skip_sync: "true"
+          skip_status_check: "true"
+
   argocd-release:
-    needs: ci
+    needs:
+      - ci
+      - helm
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Publish ArgoCD Helm chart update
-        uses: pipery-dev/pipery-argocd-cd@main
+        uses: pipery-dev/pipery-argocd-cd@v1
         with:
           publish_helm_chart_update: "true"
           argocd_repository: pipery-dev/pipery-argocd

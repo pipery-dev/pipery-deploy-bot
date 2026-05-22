@@ -90,8 +90,8 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: config
-          secret:
-            secretName: {{ include "pipery-deploy-bot.configSecretName" . }}
+          configMap:
+            name: {{ include "pipery-deploy-bot.configName" . }}
         {{- if or .Values.privateKey.existingSecret .Values.privateKey.value }}
         - name: private-key
           secret:
