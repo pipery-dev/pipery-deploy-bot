@@ -16,6 +16,7 @@ serviceAccount:
 
 podAnnotations: {}
 podLabels: {}
+hostAliases: []
 
 podSecurityContext:
   runAsNonRoot: true
