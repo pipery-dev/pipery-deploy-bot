@@ -12,6 +12,12 @@ permissions:
   contents: write
   packages: write
 
+env:
+  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_REPOSITORY: ghcr.io/${{ github.repository }}
+  RELEASE_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+  RELEASE_SHA_TAG: sha-${{ github.sha }}
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -23,6 +29,12 @@ jobs:
           tests_path: "./..."
           target_platforms: linux/amd64,linux/arm64,windows/amd64,darwin/amd64
           image_name: ghcr.io/${{ github.repository }}
+          release_docker_image: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
+          docker_image: ${{ env.IMAGE_NAME }}
+          docker_tags: ${{ env.RELEASE_IMAGE_TAG }},${{ env.RELEASE_SHA_TAG }}
+          docker_platforms: linux/arm64
+          docker_username: ${{ github.actor }}
+          docker_password: ${{ secrets.GITHUB_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           skip_release: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
           skip_reintegration: "true"
@@ -58,8 +70,8 @@ jobs:
           app_namespace: pipery
           chart_path: charts/pipery-deploy-bot
           chart_target_revision: ${{ github.ref_name }}
-          image_repository: ghcr.io/${{ github.repository }}
-          image_tag: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+          image_repository: ${{ env.IMAGE_REPOSITORY }}
+          image_tag: ${{ env.RELEASE_IMAGE_TAG }}
           helm_values: |
             imagePullSecrets:
               - name: ghcr-pull-secret
